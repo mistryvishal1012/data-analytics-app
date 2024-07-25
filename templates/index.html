@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Linear Regression Analysis</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 20px;
+        }
+        #plot {
+            max-width: 80%;
+            height: auto;
+            margin: 20px auto;
+            display: none; /* Hide the plot initially */
+        }
+        #results {
+            margin-top: 20px;
+            display: none; /* Hide results initially */
+        }
+        #results p {
+            font-size: 18px;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Linear Regression Analysis</h1>
+    <button id="fetchData">Fetch Analysis Data</button>
+    <div id="results">
+        <p><strong>Intercept:</strong> <span id="intercept">N/A</span></p>
+        <p><strong>Slope:</strong> <span id="slope">N/A</span></p>
+        <p><strong>Mean Squared Error:</strong> <span id="mse">N/A</span></p>
+        <p><strong>R-squared:</strong> <span id="r2">N/A</span></p>
+    </div>
+    <img id="plot" src="" alt="Regression Plot" />
+
+    <script>
+        document.getElementById('fetchData').addEventListener('click', async () => {
+            try {
+                // Fetch data from the Flask API endpoint
+                const response = await fetch('/analyze');
+                const data = await response.json();
+
+                // Update the results section with analysis data
+                document.getElementById('intercept').textContent = data.intercept || 'N/A';
+                document.getElementById('slope').textContent = data.slope || 'N/A';
+                document.getElementById('mse').textContent = data.mean_squared_error || 'N/A';
+                document.getElementById('r2').textContent = data.r_squared || 'N/A';
+
+                // Update the plot image source and show the plot
+                const plotImage = document.getElementById('plot');
+                plotImage.src = `data:image/png;base64,${data.plot}`;
+                plotImage.style.display = 'block'; // Show the plot
+
+                // Show the results section
+                document.getElementById('results').style.display = 'block';
+            } catch (error) {
+                console.error('Error fetching data:', error);
+                // Handle errors, e.g., by displaying an error message
+                document.getElementById('results').innerHTML = '<p style="color: red;">Failed to fetch data. Please try again later.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
